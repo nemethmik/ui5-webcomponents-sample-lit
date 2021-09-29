@@ -1,6 +1,12 @@
 {
   "name": "littodo1simple",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "A series of todo sample applications with UI5 web components, Vite, Lit and TypeScript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nemethmik/ui5-webcomponents-sample-lit"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
