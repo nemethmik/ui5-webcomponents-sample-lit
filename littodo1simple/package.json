@@ -1,0 +1,23 @@
+{
+  "name": "littodo1simple",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
+    "servor": "npx servor dist index.html 8080 --browse --reload",
+    "fix": "eslint src --fix"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.32.0",
+    "typescript": "^4.3.2",
+    "vite": "^2.5.4"
+  },
+  "dependencies": {
+    "@ui5/webcomponents": "^1.0.0-rc.15",
+    "@ui5/webcomponents-fiori": "^1.0.0-rc.15",
+    "lit": "^2.0.0"
+  }
+}
