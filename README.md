@@ -95,4 +95,5 @@ THIS IS TERRIBLY IMPORTANT, OTHERWISE Lit Element won't work.
 - At this stage I have created a (free) Azure Static Web App (littodo1simple) defining */littodo1simple* as the root and *dist* as the build folder when the Azure Static Web Apps extension plugin asked.
     - https://orange-field-01bd0ee03.azurestaticapps.net/
 
-
+## Implementing the Todo App 
+- I started with copying [JSX block ftom the React App.js](https://github.com/SAP-samples/ui5-webcomponents-sample-react/blob/main/src/App.js) and I tailored it to the Lit syntax.
