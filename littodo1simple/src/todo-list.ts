@@ -2,7 +2,6 @@ import {html,css,CSSResult, TemplateResult,LitElement} from "lit"
 import {customElement,property} from "lit/decorators.js"
 import "@ui5/webcomponents/dist/List" // These are optional imports
 import "@ui5/webcomponents/dist/CustomListItem"
-import "@ui5/webcomponents/dist/Checkbox"
 import {TTodoItem} from "./main"
 
 @customElement("todo-list")
