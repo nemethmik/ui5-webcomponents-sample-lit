@@ -3,7 +3,7 @@
 A clean, no-framework implementation of the sample application using state of the art tooling for web component development with Vite, Lit and TypeScript.
 ESLint is used for linting TyeScript.
 
-This is a multiproject repository, the actual projects can be found in the subfolders.
+This is a multiproject repository, the actual projects can be found in the subfolders. You may also find a number of branches as the project implementation went ahead.
 
 The projects here are based on the samples [ui5-webcomponents-sample-react](https://github.com/SAP-samples/ui5-webcomponents-sample-react)
 
@@ -92,4 +92,7 @@ THIS IS TERRIBLY IMPORTANT, OTHERWISE Lit Element won't work.
     - You can test the build with *npm run servor* (Yes, servor)
     - Now you are ready to deploy.
 - Now you can Inititialize the folder for Git, commit and publish on GitHub or Azure DevOps, all with the built in Git tools of Visual Studio Code
+- At this stage I have created a (free) Azure Static Web App (littodo1simple) defining */littodo1simple* as the root and *dist* as the build folder when the Azure Static Web Apps extension plugin asked.
+    - https://orange-field-01bd0ee03.azurestaticapps.net/
+
 
