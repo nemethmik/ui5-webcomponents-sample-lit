@@ -13,6 +13,7 @@ import "@ui5/webcomponents/dist/Dialog"
 import "@ui5/webcomponents/dist/Label"
 import "@ui5/webcomponents/dist/TextArea"
 import "@ui5/webcomponents-fiori/dist/ShellBar"
+import "@ui5/webcomponents-icons/dist/AllIcons.js"
 import "./todo-list"
 
 export type TTodoBeingEditted = {
@@ -22,6 +23,10 @@ export type TTodoBeingEditted = {
 }
 export type TTodoItem = TTodoBeingEditted & {
   done: boolean,
+}
+interface UI5Dialog extends HTMLElement {
+  show():void,
+  close():void,
 }
 
 @customElement("sample-app")
@@ -73,23 +78,6 @@ class SampleApp extends LitElement {
 
       #date-picker {
         margin: 0 0.5rem 0 0.5rem;
-      }
-
-      .li-content {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .li-content-text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .edit-btn {
-        margin-right: 1rem;
       }
 
       .dialog-content {
@@ -163,40 +151,50 @@ class SampleApp extends LitElement {
   ]
   setTodos(newTodos:TTodoItem[]):void {this.todos = newTodos}
   @state() todoBeingEditted:TTodoBeingEditted = {id: 0,text: "",deadline: ""}
-  setTodoBeingEditted(e:TTodoBeingEditted) {this.todoBeingEditted = e}
-  handleDone(event:CustomEvent):void {
-    const selectedItem = event.detail.selectedItems[0];
-    const selectedId = selectedItem.getAttribute("data-key");
-    const newTodos = this.todos.map(todo => {
-      return { ...todo, done: (todo.done || (selectedId === todo.id.toString())) };
-    })
-    this.setTodos(newTodos)
+  setTodoBeingEditted(e:TTodoBeingEditted):void {this.todoBeingEditted = e}
+  handleDone = (id:number):void => {
+    this.setTodos(this.todos.map(todo => {
+      return { ...todo, done: (todo.done || (id === todo.id)) }
+    }))
   }
-  handleRemove(id:number):void {
+  handleUnDone = (id:number):void => {
+    this.setTodos(this.todos.map((todo) => {
+      return {...todo, done: todo.id === id ? false : todo.done }
+    }))
+  }
+  handleRemove = (id:number):void => {
     this.setTodos(this.todos.filter(todo => todo.id !== id))
   }
-  handleEdit(id:number):void {
+  handleEdit = (id:number):void => {
     const todoObj = this.todos.filter(todo => {
       return todo.id === id
-    })[0];
+    })[0]
     this.setTodoBeingEditted({
       id: id,
       text: todoObj.text,
       deadline: todoObj.deadline
     })
-    //editDialog.current.open();
+    this.editDialog.value?.show()
   }
-  handleUnDone(event:CustomEvent) {
-    const selectedItems = event.detail.selectedItems;
+  handleCancel = ():void => {this.editDialog.value?.close()}
+  handleSave = ():void => {
+    const edittedText = this.titleEditInput.value?.value
+    const edittedDate = this.dateEditInput.value?.value
     this.setTodos(this.todos.map((todo) => {
-      const unselectedItem = selectedItems.filter(item => item.getAttribute("data-key") === todo.id.toString());
-      todo.done = !!unselectedItem[0];
-      return todo;
+      if (todo.id === this.todoBeingEditted.id) {
+        todo.text = edittedText as string
+        todo.deadline = edittedDate as string
+      }
+      return todo
     }))
+    this.editDialog.value?.close()
   }
+  dateEditInput = createRef<HTMLInputElement>()
+  titleEditInput = createRef<HTMLInputElement>()
+  editDialog = createRef<UI5Dialog>() 
   todoInput = createRef<HTMLInputElement>()
   todoDeadline = createRef<HTMLInputElement>()
-  handleAdd():void {
+  handleAdd = ():void => {
     this.setTodos([
       ...this.todos,
       {
@@ -216,13 +214,13 @@ class SampleApp extends LitElement {
         <section class="app-content">
           <div class="create-todo-wrapper">
             <ui5-input placeholder="My Todo ..." ${ref(this.todoInput)} class="add-todo-element-width" id="add-input"></ui5-input>
-            <ui5-datepicker format-pattern="dd/MM/yyyy" class="add-todo-element-width" ${ref(this.todoDeadline)} id="date-picker"></ui5-datepicker>
+            <ui5-date-picker format-pattern="dd/MM/yyyy" class="add-todo-element-width" ${ref(this.todoDeadline)} id="date-picker"></ui5-date-picker>
             <ui5-button class="add-todo-element-width" @click=${this.handleAdd} design="Emphasized">Add Todo</ui5-button>
           </div>
           <div class="list-todos-wrapper">
             <todo-list
               .items=${this.todos.filter(todo => !todo.done)}
-              .selectionChange=${this.handleDone as EventListener}
+              .selectionChange=${this.handleDone}
               .handleDelete=${this.handleRemove}
               .handleEdit=${this.handleEdit}
             >
@@ -238,20 +236,20 @@ class SampleApp extends LitElement {
             </ui5-panel>
           </div>
         </section>
-        <ui5-dialog header-text="Edit Todo item" ref={editDialog}>
+        <ui5-dialog header-text="Edit Todo item" ${ref(this.editDialog)}>
           <div class="dialog-content">
             <div class="edit-wrapper">
                 <ui5-label>Title:</ui5-label>
-                <ui5-textarea class="title-textarea" max-length="24" show-exceeded-text value={todoBeingEditted.text} ref={titleEditInput}></ui5-textarea>
+                <ui5-textarea class="title-textarea" max-length="24" show-exceeded-text value=${this.todoBeingEditted.text} ${ref(this.titleEditInput)}></ui5-textarea>
             </div>
             <div class="edit-wrapper date-edit-fields">
                 <ui5-label>Date:</ui5-label>
-                <ui5-datepicker format-pattern="dd/MM/yyyy" value={todoBeingEditted.deadline} ref={dateEditInput}></ui5-datepicker>
+                <ui5-date-picker format-pattern="dd/MM/yyyy" value=${this.todoBeingEditted.deadline} ${ref(this.dateEditInput)}></ui5-date-picker>
             </div>
           </div>
             <div class="dialog-footer" >
-              <ui5-button design="Transparent" ref={cancelBtn}>Cancel</ui5-button>{/*close dialog*/}
-              <ui5-button design="Emphasized" ref={saveBtn}>Save</ui5-button>{/*save dialog info*/}
+              <ui5-button design="Transparent" @click=${this.handleCancel} >Cancel</ui5-button>
+              <ui5-button design="Emphasized" @click=${this.handleSave}>Save</ui5-button>
             </div>
         </ui5-dialog>
       </div>
