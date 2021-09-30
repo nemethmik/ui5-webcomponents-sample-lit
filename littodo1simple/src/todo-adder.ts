@@ -1,8 +1,9 @@
 import {html,css,CSSResult, TemplateResult,LitElement} from "lit"
 import {customElement} from "lit/decorators.js"
 import {ref,createRef} from "lit/directives/ref.js"
-import "@ui5/webcomponents/dist/List" // These are optional imports
-import "@ui5/webcomponents/dist/CustomListItem"
+import "@ui5/webcomponents/dist/Input"
+import "@ui5/webcomponents/dist/DatePicker"
+import "@ui5/webcomponents/dist/Button"
 import {dispatchTodoEvent} from "./appstructuresandevents"
 
 @customElement("todo-adder")
@@ -20,10 +21,7 @@ class TodoAdder extends LitElement {
       .add-todo-element-width {
         width: auto;
       }
-      #add-input {
-        flex: auto;
-      }
-      #date-picker {
+      ui5-date-picker {
         margin: 0 0.5rem 0 0.5rem;
       }
       @media(max-width: 600px) {
@@ -35,19 +33,23 @@ class TodoAdder extends LitElement {
           width: 100%;
         }
 
-        #date-picker {
+        ui5-date-picker {
           margin: 0.5rem 0 0.5rem 0;
         }
       }
     `} 
-    //ref is better for elemnts of which there are many in a template since then you don't need an id
+    //When there are multiple elements of the same type in a template,
+    // ref is better than @query, since then you don't need to define ids.
     todoInput = createRef<HTMLInputElement>()
     todoDeadline = createRef<HTMLInputElement>()
     override render():TemplateResult { return html`
         <div class="create-todo-wrapper">
-        <ui5-input placeholder="My Todo ..." ${ref(this.todoInput)} class="add-todo-element-width" id="add-input"></ui5-input>
-        <ui5-date-picker format-pattern="dd/MM/yyyy" class="add-todo-element-width" ${ref(this.todoDeadline)} id="date-picker"></ui5-date-picker>
-        <ui5-button class="add-todo-element-width" @click=${():void => {
+        <ui5-input placeholder="My Todo ..." ${ref(this.todoInput)} 
+            class="add-todo-element-width" style="flex: auto;"></ui5-input>
+        <ui5-date-picker format-pattern="dd/MM/yyyy" ${ref(this.todoDeadline)}
+            class="add-todo-element-width"></ui5-date-picker>
+        <ui5-button class="add-todo-element-width" 
+            @click=${():void => {
             dispatchTodoEvent(this,{type:"Add",todo:{
                 id:0, // It will be replaced with a proper ID
                 text: this.todoInput.value?.value as string,

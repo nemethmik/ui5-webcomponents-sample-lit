@@ -2,6 +2,11 @@ import {html, css, LitElement, TemplateResult, CSSResult} from "lit"
 import { customElement, state} from "lit/decorators.js"
 import {ref,createRef} from "lit/directives/ref.js"
 import {TTodoBase,UI5Dialog,dispatchTodoEvent} from "./appstructuresandevents"
+import "@ui5/webcomponents/dist/Dialog"
+import "@ui5/webcomponents/dist/Label"
+import "@ui5/webcomponents/dist/TextArea"
+import "@ui5/webcomponents/dist/DatePicker"
+import "@ui5/webcomponents/dist/Button"
   
 @customElement("todo-edit")
 export class TodoEdit extends LitElement {
