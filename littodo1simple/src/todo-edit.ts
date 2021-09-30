@@ -1,11 +1,10 @@
 import {html, css, LitElement, TemplateResult, CSSResult} from "lit"
-import { customElement, state, property } from "lit/decorators.js"
+import { customElement, state} from "lit/decorators.js"
 import {ref,createRef} from "lit/directives/ref.js"
-import {TTodoBase,UI5Dialog} from "./appstructuresandevents"
+import {TTodoBase,UI5Dialog,dispatchTodoEvent} from "./appstructuresandevents"
   
 @customElement("todo-edit")
 export class TodoEdit extends LitElement {
-    @property() saveCallback!:(e:TTodoBase)=>void
     //@state is required since when the dialog is opened with a new set of values  
     //@state will trigger re-rendering. This is the declarative reactive way
     @state() todo:TTodoBase = {id: 0,text: "",deadline: ""}
@@ -57,11 +56,11 @@ export class TodoEdit extends LitElement {
               <ui5-button design="Emphasized" @click=${():void => {
                   const edittedText = this.titleEditInput.value?.value as string
                   const edittedDate = this.dateEditInput.value?.value as string
-                  this.saveCallback({
+                  dispatchTodoEvent(this,{type:"Save",todo:{
                     id:this.todo.id,
                     deadline:edittedDate,
                     text:edittedText
-                    })
+                  }})
                   this.close()
                 }}>Save</ui5-button>
             </div>
