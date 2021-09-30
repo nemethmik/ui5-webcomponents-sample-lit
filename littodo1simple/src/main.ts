@@ -47,31 +47,31 @@ class SampleApp extends LitElement {
     {
       text: "Get some carrots",
       id: 1,
-      deadline: "27/7/2018",
+      deadline: "27/7/2022",
       done: false
     },
     {
       text: "Do some magic",
       id: 2,
-      deadline: "22/7/2018",
+      deadline: "22/7/2022",
       done: false
     },
     {
       text: "Go to the gym",
       id: 3,
-      deadline: "24/7/2018",
+      deadline: "24/7/2022",
       done: true
     },
     {
       text: "Buy milk",
       id: 4,
-      deadline: "30/7/2018",
+      deadline: "30/7/2022",
       done: false
     },
     {
       text: "Eat some fruits",
       id: 5,
-      deadline: "29/7/2018",
+      deadline: "29/7/2022",
       done: false
     }
   ]
