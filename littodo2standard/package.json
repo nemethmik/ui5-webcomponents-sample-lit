@@ -1,7 +1,7 @@
 {
-  "name": "littodo1simple",
-  "version": "1.0.0",
-  "description": "A UI5 web components todo sample application using callback function with Vite, Lit and TypeScript",
+  "name": "littodo2standard",
+  "version": "2.0.0",
+  "description": "A UI5 web components todo sample application using Custom Events with Vite, Lit and TypeScript ",
   "repository": {
     "type": "git",
     "url": "https://github.com/nemethmik/ui5-webcomponents-sample-lit"

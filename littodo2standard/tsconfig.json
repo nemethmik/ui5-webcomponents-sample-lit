@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "experimentalDecorators": true, 
+    "inlineSourceMap": true, 
+    "noImplicitAny": false,    
+    "strictNullChecks": true,  
+    "strictFunctionTypes": true, 
+    "noImplicitThis": true 
+  },
+  "include": ["./src"]
+}
