@@ -1,5 +1,6 @@
-import {html,css,CSSResult, TemplateResult,LitElement} from "lit"
+import {html,css,CSSResult, TemplateResult} from "lit"
 import {customElement,query} from "lit/decorators.js"
+import {MobxLitElement} from "@adobe/lit-mobx"
 import "@ui5/webcomponents/dist/Title"
 import "@ui5/webcomponents/dist/Button"
 import "@ui5/webcomponents/dist/Input"
@@ -19,7 +20,7 @@ import "./todo-edit"
 import {TodoEdit} from "./todo-edit"
 
 @customElement("sample-app")
-class SampleApp extends LitElement {
+class SampleApp extends MobxLitElement {
   static override get styles():CSSResult { return css`
       .app {
         height: 100%;
@@ -56,6 +57,7 @@ class SampleApp extends LitElement {
     })
   }
   override async connectedCallback():Promise<void> {
+    super.connectedCallback()
     this.addEventListener(TTodoEvent,((e:CustomEvent):void => {
       const detail = e.detail as TTodoActions
       switch(detail.type) {
@@ -66,11 +68,7 @@ class SampleApp extends LitElement {
         case "Save": appStore.saveTodoAfterEdited(detail.todo); break
         case "Add": appStore.addTodo(detail.todo); break
       }
-      this.requestUpdate()
     }) as EventListener)
-    await appStore.initAsync()
-    //CALLING THE SUPER is important here, since we need the data before rendering the componnet on the screen.
-    super.connectedCallback()
   }    
   override render():TemplateResult {
     return html`

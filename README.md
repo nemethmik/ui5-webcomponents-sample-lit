@@ -34,10 +34,113 @@ In my example all state change triggering events are handled in a single event l
 ```
 Since my *SampleApp* depends on loading the todos automatically when it is connected to the DOM, the appStore.initAsync should be called explicitly. And only after the initialization the super.connectedCallback is to be called, because super.connectedCallback will trigger the rendering machinery.
 This is not perfect since then we cannot display a loading spinner/indicator on the screen.
-    - This solution worked so great, that I made a branch *littodo3appstate1nomobex* for that.
+    - This solution worked so great, that I made a branch *littodo3appstate1nomobx* for that.
 
 - **npm i modx @adobe/lit-mobx** 
+- It is amazingly surprising that the only thing to do is to call [makeAutoObservable](https://mobx.js.org/observable-state.html#makeautoobservable) in the constructor of the *AppStore* class.
+    ```ts
+    class AppStore {
+    todos:TTodoItem[] = []
+    constructor(){
+        makeAutoObservable(this)
+        this._initAsync()
+    }
+    private async _initAsync():Promise<void> {
+        //To simulate some async initialization
+        await new Promise((r) => setTimeout(r, 0))
+    }
+    setTodos(newTodos:TTodoItem[]):void {this.todos = newTodos}
+    todoCompleted(id:number):void {
+        this.setTodos(this.todos.map(todo => {
+        return { ...todo, done: (todo.done || (id === todo.id)) }
+        }))
+    }
+    ...
+    }
+    ```
+    - The [Creating Application Stores](https://vaadin.com/docs/latest/fusion/tutorials/in-depth-course/application-state-management-with-mobx/#creating-the-crm-application-state-stores) tutorial shows an example how to fine tune the annotations by *makeAutoObservable*, private cannot be added to the overrides parameter object.
+        ```ts
+        import { makeAutoObservable, observable, runInAction } from 'mobx';
+        export class CrmStore {
+            contacts: Contact[] = [];
+            companies: Company[] = [];
+            statuses: Status[] = [];
+            constructor() {
+                makeAutoObservable(
+                    this,
+                    {
+                        initFromServer: false,
+                        contacts: observable.shallow,
+                        companies: observable.shallow,
+                        statuses: observable.shallow,
+                    },
+                    { autoBind: true }
+                );
+                this.initFromServer();
+            }
+            ...
+        }
+        ```
+- Using the store is dead easy, too:
+    ```ts
+    @customElement("sample-app")
+    class SampleApp extends MobxLitElement {
+        editTodo(id:number):void {
+            const todoObj = appStore.todos.filter(todo => {...})
+            ...
+        }
+        override async connectedCallback():Promise<void> {
+            super.connectedCallback()
+            this.addEventListener(TTodoEvent,((e:CustomEvent):void => {
+            const detail = e.detail as TTodoActions
+            switch(detail.type) {
+                case "Completed": appStore.todoCompleted(detail.id); break
+                case "Undo": appStore.undoTodo(detail.id); break
+                case "Delete": appStore.removeTodo(detail.id); break
+                case "Edit": this.editTodo(detail.id); break
+                case "Save": appStore.saveTodoAfterEdited(detail.todo); break
+                case "Add": appStore.addTodo(detail.todo); break
+            }
+            }) as EventListener)
+        }    
+        override render():TemplateResult {
+            return html`
+            ...
+            <todo-list .items=${appStore.todos.filter(todo => !todo.done)}></todo-list>
+            <ui5-panel header-text="Completed tasks" 
+                ?collapsed=${!appStore.todos.filter(todo => todo.done).length || undefined}>
+                <todo-list .items=${appStore.todos.filter(todo => todo.done)}></todo-list>
+            `
+        }  
+    }
+    ```
+    Since in my case only the *SampleApp* class uses the *appStore* only it has to be derived from *MobxLitElement*. All the subcomponents will receive their data directly from the parent:
+    - `todo-list` is used twice and it receices a subset of the todo array elements; so, it would be totally meaningless to directly connect *todo-list* to the app store.
+    - `todo-adder` has no input properties at all
+    - `todo-edit` receives its input via the *show* function call.
+- The custom events: Completed, Undo, Delete, Save and Add all could be removed, since the components sending these messages could call directly the corresponding MobX store action function, but since the event listener acts like a centralized state *reducer*, it would be a lot less clean solution; it's not necessarily the responsibility/concern of the visual subcomponents to interact directly with the application store.
+Even if it was, *Edit* event cannot be avoided, since it first gets the data from the store and then opens a UI component passing the selected todo data to it.
 
+## littodo2standard
+Is the cleanest solution using standard web browser tools: custom elements, of course and custom events. No callbacks are needed at all, they should be replaced with custom elements. The event handler defined on the application class level behaves like a central state reducer. 
+The heart of this solution is *TTodoActions* **discriminated union type** definition, which is a brilliant TypeScript feature specifically applied for modeling the payload of reducers. React useReducer and Redux uses this construct extensively.
+```ts
+export const TTodoEvent = "TodoEvent"
+//This is a discriminated union type definition for a reducer-like function 
+//with type as the common field followed by the payload type
+export type TTodoActions = 
+    {type: "Save", todo: TTodoBase} //Save the data after being edited 
+  | {type: "Edit", id: number} //Open a dialog box for the user to modify the data
+  | {type: "Completed", id: number} //Mark the todo completed
+  | {type: "Undo", id: number}
+  | {type: "Delete", id: number}
+  | {type: "Add", todo: TTodoBase} 
+export function dispatchTodoEvent(el:HTMLElement,detail:TTodoActions):void {
+  el.dispatchEvent(new CustomEvent(TTodoEvent,{detail,composed:true}))
+}
+```
+There is only a single event, *TodoEvent* the actual action is the type and the payload can be totally different for each action. Visual Studio Code is brilliantly smart with this unique feature of TypeScript. This is an important pillar that makes the application robust and maintainable.
+*dispatchTodoEvent* is a terribly useful function to dispatch properly; it automatically sets the *detail* and *composed* fields in the CustomEvent object.
 
 ## littodo1simple
 This is the simplest implemantation using just the basic toolset: Vite, Lit, TypeScript and UI5 Web Components, of course.

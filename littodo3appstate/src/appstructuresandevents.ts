@@ -1,4 +1,4 @@
-//import {makeAutoObservable} from "mobx"
+import {makeAutoObservable} from "mobx"
 
 export type TTodoBase = {
     id: number,
@@ -30,10 +30,10 @@ class AppStore {
   todos:TTodoItem[] = []
   private _initialized = false
   constructor(){
-    //makeAutoObservable(this)
-    this.initAsync()
+    makeAutoObservable(this)
+    this._initAsync()
   }
-  public async initAsync():Promise<void> {
+  private async _initAsync():Promise<void> {
     if(!this._initialized) {
       //To simulate some async initialization
       await new Promise((r) => setTimeout(r, 0))
