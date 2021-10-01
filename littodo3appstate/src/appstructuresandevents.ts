@@ -28,48 +28,45 @@ export function dispatchTodoEvent(el:HTMLElement,detail:TTodoActions):void {
 
 class AppStore {
   todos:TTodoItem[] = []
-  private _initialized = false
   constructor(){
     makeAutoObservable(this)
     this._initAsync()
   }
   private async _initAsync():Promise<void> {
-    if(!this._initialized) {
-      //To simulate some async initialization
-      await new Promise((r) => setTimeout(r, 0))
-      this.setTodos([{
-          text: "Get some carrots",
-          id: 1,
-          deadline: "27/7/2022",
-          done: false
-        },
-        {
-          text: "Do some magic",
-          id: 2,
-          deadline: "22/7/2022",
-          done: false
-        },
-        {
-          text: "Go to the gym",
-          id: 3,
-          deadline: "24/7/2022",
-          done: true
-        },
-        {
-          text: "Buy milk",
-          id: 4,
-          deadline: "30/7/2022",
-          done: false
-        },
-        {
-          text: "Eat some fruits",
-          id: 5,
-          deadline: "29/7/2022",
-          done: false
-        }
-      ])
-      this._initialized = true
-    }
+    //To simulate some async initialization
+    await new Promise((r) => setTimeout(r, 0))
+    this.setTodos([{
+        text: "Get some carrots",
+        id: 1,
+        deadline: "27/7/2022",
+        done: false
+      },
+      {
+        text: "Do some magic",
+        id: 2,
+        deadline: "22/7/2022",
+        done: false
+      },
+      {
+        text: "Go to the gym",
+        id: 3,
+        deadline: "24/7/2022",
+        done: true
+      },
+      {
+        text: "Buy milk",
+        id: 4,
+        deadline: "30/7/2022",
+        done: false
+      },
+      {
+        text: "Eat some fruits",
+        id: 5,
+        deadline: "29/7/2022",
+        done: false
+      }
+    ])
+    this.maxId = this.todos.length + 1
   }
   setTodos(newTodos:TTodoItem[]):void {this.todos = newTodos}
   todoCompleted(id:number):void {
@@ -85,7 +82,7 @@ class AppStore {
   removeTodo(id:number):void {
     this.setTodos(this.todos.filter(todo => todo.id !== id))
   }
-  maxId = this.todos.length + 1
+  private maxId = 0
   addTodo(todo:TTodoBase):void {
     this.setTodos([
       ...this.todos,
