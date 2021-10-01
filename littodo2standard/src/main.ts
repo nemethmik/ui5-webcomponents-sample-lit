@@ -153,7 +153,7 @@ class SampleApp extends LitElement {
             </ui5-panel>
           </div>
         </section>
-        <todo-edit .saveCallback=${this.saveTodoAfterEdited}></todo-edit>
+        <todo-edit></todo-edit>
       </div>
     `
   }  

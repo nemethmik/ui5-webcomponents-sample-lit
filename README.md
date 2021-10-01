@@ -7,6 +7,38 @@ This is a multiproject repository, the actual projects can be found in the subfo
 
 The projects here are based on the samples [ui5-webcomponents-sample-react](https://github.com/SAP-samples/ui5-webcomponents-sample-react)
 
+## littodo3appstate
+This is the 3rd and last iteration of the todo application series; this version is enhanced to use MobX state management tool.
+The Marcus Hellberg video [LitElement state management with MobX](https://youtu.be/MNxnZ8pzSBo) is an excellent intro.
+- The forst step doesn't even require MobX at all: I created a singleton *AppStore* class along with a global variable *appStore* and I relocated the todo array and its relevant manipulators from the *SampleApp* (main.ts) class.
+    - I created an `async initAsync()` to load demo data into the todo array simulating a remote service call. *initAsync* is automatically called from the *AppStore* *constructor*, but it could also be called from any components that want the data upon their *connectedCallback*; *initAsync* is executed only once actually since it uses a private *_initialized* field.
+- It was a brilliant idea to centralize all state change notification machinery and paths with the introduction of *CustomEvent* and tthe **discriminated union type** as a payload for the *detail* field.
+In my example all state change triggering events are handled in a single event listener, which calls the appropriate functions of the *appStore*; afterwards, it requests a rerendering with `this.requestUpdate()`, and that's all: awesome.
+```ts
+  override async connectedCallback():Promise<void> {
+    this.addEventListener(TTodoEvent,((e:CustomEvent):void => {
+      const detail = e.detail as TTodoActions
+      switch(detail.type) {
+        case "Completed": appStore.todoCompleted(detail.id); break
+        case "Undo": appStore.undoTodo(detail.id); break
+        case "Delete": appStore.removeTodo(detail.id); break
+        case "Edit": this.editTodo(detail.id); break
+        case "Save": appStore.saveTodoAfterEdited(detail.todo); break
+        case "Add": appStore.addTodo(detail.todo); break
+      }
+      this.requestUpdate()
+    }) as EventListener)
+    await appStore.initAsync()
+    super.connectedCallback()
+  }    
+```
+Since my *SampleApp* depends on loading the todos automatically when it is connected to the DOM, the appStore.initAsync should be called explicitly. And only after the initialization the super.connectedCallback is to be called, because super.connectedCallback will trigger the rendering machinery.
+This is not perfect since then we cannot display a loading spinner/indicator on the screen.
+    - This solution worked so great, that I made a branch *littodo3appstate1nomobex* for that.
+
+- **npm i modx @adobe/lit-mobx** 
+
+
 ## littodo1simple
 This is the simplest implemantation using just the basic toolset: Vite, Lit, TypeScript and UI5 Web Components, of course.
 
