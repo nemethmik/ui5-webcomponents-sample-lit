@@ -108,10 +108,10 @@ This is not perfect since then we cannot display a loading spinner/indicator on 
         override render():TemplateResult {
             return html`
             ...
-            <todo-list .items=${appStore.todos.filter(todo => !todo.done)}></todo-list>
+            <todo-list .items=${appStore.tobedoneTodos}></todo-list>
             <ui5-panel header-text="Completed tasks" 
-                ?collapsed=${!appStore.todos.filter(todo => todo.done).length || undefined}>
-                <todo-list .items=${appStore.todos.filter(todo => todo.done)}></todo-list>
+                ?collapsed=${appStore.numberOfcompletedTodos == 0}>
+                <todo-list .items=${appStore.completedTodos}></todo-list>
             `
         }  
     }
@@ -120,6 +120,7 @@ This is not perfect since then we cannot display a loading spinner/indicator on 
     - `todo-list` is used twice and it receices a subset of the todo array elements; so, it would be totally meaningless to directly connect *todo-list* to the app store.
     - `todo-adder` has no input properties at all
     - `todo-edit` receives its input via the *show* function call.
+    - Check out how [MobX computed](https://mobx.js.org/computeds.html#deriving-information-with-computeds) getters are used.
 - The custom events: Completed, Undo, Delete, Save and Add all could be removed, since the components sending these messages could call directly the corresponding MobX store action function, but since the event listener acts like a centralized state *reducer*, it would be a lot less clean solution; it's not necessarily the responsibility/concern of the visual subcomponents to interact directly with the application store.
 Even if it was, *Edit* event cannot be avoided, since it first gets the data from the store and then opens a UI component passing the selected todo data to it.
 
