@@ -79,9 +79,9 @@ class SampleApp extends MobxLitElement {
         <section class="app-content">
           <todo-adder></todo-adder>
           <div>
-            <todo-list .items=${appStore.todos.filter(todo => !todo.done)}></todo-list>
-            <ui5-panel header-text="Completed tasks" ?collapsed=${!appStore.todos.filter(todo => todo.done).length || undefined}>
-              <todo-list .items=${appStore.todos.filter(todo => todo.done)}></todo-list>
+            <todo-list .items=${appStore.tobedoneTodos}></todo-list>
+            <ui5-panel header-text="Completed todos" ?collapsed=${appStore.numberOfcompletedTodos == 0}>
+              <todo-list .items=${appStore.completedTodos}></todo-list>
             </ui5-panel>
           </div>
         </section>

@@ -105,5 +105,8 @@ class AppStore {
       return todo
     }))
   }
+  get tobedoneTodos():TTodoItem[] {return this.todos.filter(todo => !todo.done)}
+  get completedTodos():TTodoItem[] {return this.todos.filter(todo => todo.done)}
+  get numberOfcompletedTodos():number {return this.completedTodos.length}
 }
 export const appStore = new AppStore()
